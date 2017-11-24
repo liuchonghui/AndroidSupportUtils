@@ -1,0 +1,3 @@
+include ':utils:utils'
+include ':samples:app' // 用compile方式使用utils
+include ':samples:app2' // 用compile project方式使用utils
