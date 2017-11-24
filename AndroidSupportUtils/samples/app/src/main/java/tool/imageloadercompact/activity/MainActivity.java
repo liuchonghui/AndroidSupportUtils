@@ -1,10 +1,8 @@
 package tool.imageloadercompact.activity;
 
 import android.app.Activity;
-import android.compact.impl.TaskCallback;
-import android.compact.impl.TaskImpl;
-import android.compact.impl.TaskPayload;
-import android.content.Context;
+import android.compact.utils.FileCompactUtil;
+import android.compact.utils.IntentCompactUtil;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -26,37 +24,9 @@ public class MainActivity extends Activity {
         btn1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Task task = new Task();
-                TaskPayload payload = new TaskPayload();
-                payload.identify = "1";
-                task.run(view.getContext(), payload, new TaskCallback() {
-                    @Override
-                    public void onResult(TaskPayload payload) {
-                        btn1ret.setText(payload.identify + "|" + payload.state);
-                        Log.d("PPP", "task|onResult|" + payload.identify + "|" + payload.state);
-                    }
-                });
+                Log.d("PPP", FileCompactUtil.getCacheDirPath(view.getContext()));
+                Log.d("PPP", IntentCompactUtil.convertIntentToString(getIntent()));
             }
         });
-    }
-
-    class Task implements TaskImpl {
-        @Override
-        public void run(Context context, TaskPayload payload, TaskCallback callback) {
-            if (context == null || payload == null || payload.identify == null) {
-                return;
-            }
-
-            boolean success = false;
-            // TODO
-            payload.content = context.getPackageName();
-            success = true;
-
-            payload.state = success ? 1 : -1;
-
-            if (callback != null) {
-                callback.onResult(payload);
-            }
-        }
     }
 }
