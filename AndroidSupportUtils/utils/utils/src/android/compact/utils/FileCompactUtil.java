@@ -6,15 +6,87 @@ import android.os.Environment;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.nio.channels.FileChannel;
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.List;
 
 public class FileCompactUtil {
+
+    public static boolean verifyBinaryFile(String filePath, String targetMd5) {
+        if (filePath == null || filePath.length() == 0) {
+            return false;
+        }
+        File srcFile = new File(filePath);
+        if (!srcFile.exists() || !srcFile.isFile()) {
+            return false;
+        }
+        if (targetMd5 == null || targetMd5.length() == 0) {
+            return true;
+        }
+
+        String result = getMD5(srcFile);
+        return targetMd5.equals(result);
+    }
+
+    public static String getMD5(File file) {
+        if (file == null) {
+            return "";
+        }
+        try {
+            return getMD5(new FileInputStream(file));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "";
+    }
+
+    public static String getMD5(InputStream is) {
+        if (is == null) {
+            return "";
+        }
+        try {
+            byte[] buffer = new byte[1024];
+            MessageDigest digest = MessageDigest.getInstance("MD5");
+            int numRead = 0;
+            while (numRead != -1) {
+                numRead = is.read(buffer);
+                if (numRead > 0) {
+                    digest.update(buffer, 0, numRead);
+                }
+            }
+            return byteArray2HexString(digest.digest());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return "";
+    }
+
+    public static String byteArray2HexString(byte[] bytes) {
+        if (null == bytes) {
+            return "";
+        }
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : bytes) {
+            String str = Integer.toHexString(0xFF & b);
+            while (str.length() < 2) {
+                str = "0" + str;
+            }
+            hexString.append(str);
+        }
+        return hexString.toString();
+    }
 
     public static void copyAssetsToDir(Context context, String dir) {
         copyAssetsBySuffixToDir(context, null, dir);
