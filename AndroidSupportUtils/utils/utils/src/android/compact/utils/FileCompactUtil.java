@@ -310,4 +310,28 @@ public class FileCompactUtil {
         }
         return hexString.toString();
     }
+
+    public static String getMD5(String inputStr) {
+        if( inputStr == null) {
+            return "";
+        }
+
+        return getMD5(inputStr.getBytes());
+    }
+
+    public static String getMD5(byte[] bytes) {
+        if( bytes == null) {
+            return "";
+        }
+
+        String digest = "";
+        try {
+            MessageDigest algorithm = MessageDigest.getInstance("MD5");
+            algorithm.reset();
+            algorithm.update(bytes);
+            digest = byteArray2HexString(algorithm.digest());
+        } catch (Exception e) {
+        }
+        return digest;
+    }
 }
