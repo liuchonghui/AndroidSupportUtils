@@ -334,4 +334,81 @@ public class FileCompactUtil {
         }
         return digest;
     }
+
+    public static boolean fileRename(File from, File to) {
+        boolean result = false;
+        if (from == null || from.length() == 0) {
+            return false;
+        }
+        if (to == null || to.length() == 0) {
+            return false;
+        }
+        try {
+            result = from.renameTo(to);
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = false;
+        }
+        return result;
+    }
+
+    public static boolean replaceFileInSameDir(String dir, String fromFileName, String toFileName) {
+        if (dir == null || dir.length() == 0) {
+            return false;
+        }
+        if (fromFileName == null || fromFileName.length() == 0) {
+            return false;
+        }
+        if (toFileName == null || toFileName.length() == 0) {
+            return false;
+        }
+        long fromSize = -1L;
+        long toSize = -1L;
+        File from = new File(dir, fromFileName);
+        if (from.exists() && from.isFile()) {
+            fromSize = from.length();
+        }
+        File to = new File(dir, toFileName);
+        if (to.exists() && to.isFile()) {
+            to.delete();
+        }
+        fileRename(new File(dir, fromFileName), new File(dir, toFileName));
+        to = new File(dir, toFileName);
+        if (to.exists() && to.isFile()) {
+            toSize = to.length();
+            if (toSize == fromSize && toSize > 0) {
+                from = new File(dir, fromFileName);
+                if (from.exists() && from.isFile()) {
+                    from.delete();
+                }
+                return true;
+            }
+        }
+        to = new File(dir, toFileName);
+        if (to.exists() && to.isFile()) {
+            to.delete();
+        }
+        try {
+            to.createNewFile();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        fileChannelCopy(new File(dir, fromFileName), new File(dir, toFileName));
+        from = new File(dir, fromFileName);
+        if (from.exists() && from.isFile()) {
+            from.delete();
+        }
+        to = new File(dir, toFileName);
+        if (to.exists() && to.isFile()) {
+            toSize = to.length();
+            if (toSize == fromSize && toSize > 0) {
+                from = new File(dir, fromFileName);
+                if (from.exists() && from.isFile()) {
+                    from.delete();
+                }
+                return true;
+            }
+        }
+        return false;
+    }
 }
