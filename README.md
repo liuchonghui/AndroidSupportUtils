@@ -1,4 +1,4 @@
 # AndroidSupportUtils
 ```
-compile 'tools.android:utils:1.1.3'
+compile 'tools.android:utils:1.1.4'
 ```
